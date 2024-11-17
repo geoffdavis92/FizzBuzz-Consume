@@ -2,46 +2,71 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom";
 import * as tf from "@tensorflow/tfjs";
 import "./styles.css";
+
 const inputShape = 10;
 
-// Convert numbers to Binary tensors
+// Utility function provided - converts numbers to binary tensors
 const numToBinTensor = num =>
   tf.tensor(
     num
       .toString(2)
       .padStart(inputShape, "0")
       .split("")
-      .map(Number) // DO NOT USE parseInt here
+      .map(Number)
   );
 
 const doFizzyPrediction = async () => {
   const fizzBuzzResult = [];
-  // Hosted with ❤ by Infinite Red
-  const modelPath =
-    "https://s3.amazonaws.com/ir_public/ai/fizzbuzz/fizzbuzz-model.json";
-  const model = await tf.loadLayersModel(modelPath);
-  // STEP 1: create a batch of 100 consecutive numbers to predict
-  const first100 = tf.tidy(() =>
-    tf.stack([...Array(100).keys()].map(x => numToBinTensor(x + 1)))
-  );
+  const modelPath = "https://s3.amazonaws.com/ir_public/ai/fizzbuzz/fizzbuzz-model.json";
 
-  // STEP 2: Run model on input numbers (1 to 100)
-  const resultData = await model.predict(first100);
+  /* Workshop Task 1: Load the Pre-trained Model
+   * - Use tf.loadLayersModel() to load the model from modelPath
+   * - Remember this is an async operation!
+   * Docs: https://js.tensorflow.org/api/latest/#loadLayersModel
+   */
+  const model = null; // Your code here
 
-  // STEP 3: Build list of highest predicted results
-  resultData.unstack().forEach((result, index) => {
-    const resultData = result.dataSync(); // tensor to array
-    // find Max prediction index
-    const winner = resultData.indexOf(Math.max(...resultData));
-    fizzBuzzResult.push([index + 1, "fizz", "buzz", "fizzbuzz"][winner]);
-    result.dispose();
-  });
-  first100.dispose();
-  resultData.dispose();
-  model.dispose();
+  /* Workshop Task 2: Prepare the Input Data
+   * - Create a tensor containing binary representations of numbers 1-100
+   * - Use tf.tidy() to prevent memory leaks
+   * - Use tf.stack() to combine multiple tensors
+   * - Hint: [...Array(100).keys()] creates [0,1,2,...,99]
+   * - Use the provided numToBinTensor helper function
+   * Docs: https://js.tensorflow.org/api/latest/#tidy
+   *       https://js.tensorflow.org/api/latest/#stack
+   */
+  const first100 = null; // Your code here
+
+  /* Workshop Task 3: Make Predictions
+   * - Use model.predict() on your input tensor
+   * - This will return a tensor containing predictions for all numbers
+   * Docs: https://js.tensorflow.org/api/latest/#tf.LayersModel.predict
+   */
+  const resultData = null; // Your code here
+
+  /* Workshop Task 4: Process the Results
+   * - Use unstack() to separate the batch predictions
+   * - For each prediction:
+   *   1. Convert tensor to array using dataSync()
+   *   2. Find index of highest value using Math.max()
+   *   3. Map index to ["number", "fizz", "buzz", "fizzbuzz"]
+   * Docs: https://js.tensorflow.org/api/latest/#unstack
+   *       https://js.tensorflow.org/api/latest/#tf.Tensor.dataSync
+   */
+  // Your code here
+  // Should populate fizzBuzzResult array
+
+  /* Workshop Task 5: Cleanup
+   * - Dispose of any tensors you created
+   * - At minimum: first100, resultData, and model
+   * Docs: https://js.tensorflow.org/api/latest/#dispose
+   */
+  // Your code here
+
   return fizzBuzzResult.join(", ");
 };
 
+// React component code - no need to modify below this line
 const App = props => {
   const [fizzBuzzResult, setFizzBuzzResult] = useState("loading model...");
   useEffect(() => {
